@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { EyeIcon, ShoppingCartIcon } from '@heroicons/vue/24/solid'
+import StockModal from './StockModal.vue'
+import { useTransaction } from '@/composables/useTransaction'
 
 defineProps<{
   stocks: {
@@ -21,6 +23,9 @@ defineProps<{
       | null
   }[]
 }>()
+
+const { showModal, selectedTicker, openModal, closeModal, confirmTransaction, transactionStore } =
+  useTransaction()
 </script>
 
 <template>
@@ -53,7 +58,7 @@ defineProps<{
             >
               <EyeIcon class="h-6 w-6" />
             </RouterLink>
-            <button class="text-green-600 hover:text-green-800">
+            <button class="text-green-600 hover:text-green-800" @click="openModal(stock.Ticker)">
               <ShoppingCartIcon class="h-6 w-6" />
             </button>
           </td>
@@ -61,4 +66,15 @@ defineProps<{
       </tbody>
     </table>
   </div>
+
+  <!-- MODAL -->
+  <StockModal
+    v-if="!transactionStore.loading && !transactionStore.error"
+    :showModal="showModal"
+    :ticker="selectedTicker"
+    :closeModal="closeModal"
+    :confirmTransaction="confirmTransaction"
+  />
+  <p v-else-if="transactionStore.loading" class="text-blue-500">Cargando...</p>
+  <p v-else class="text-red-500">{{ transactionStore.error }}</p>
 </template>

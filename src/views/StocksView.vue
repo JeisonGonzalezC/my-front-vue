@@ -1,19 +1,27 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
-import { useStockStore } from '@/stores/stockStore'
 import StockTable from '../components/StockTable.vue'
+import { useStockStore } from '@/stores/stockStore'
 
 const stockStore = useStockStore()
 
 // Load stocks when the component is mounted
 onMounted(() => {
-  stockStore.fetchStocks()
+  stockStore.fetchStocks({})
 })
 
+const loadBeforePage = async () => {
+  await stockStore.fetchStocks({
+    nextPage: stockStore.stocks.BeforePages[stockStore.stocks.BeforePages.length - 1],
+    isBefore: true,
+  })
+}
+
 const loadNextPage = async () => {
-  if (stockStore.stocks.NextPage) {
-    await stockStore.fetchStocks(stockStore.stocks.NextPage)
-  }
+  await stockStore.fetchStocks({
+    nextPage: stockStore.stocks.NextPage,
+    isNext: true,
+  })
 }
 </script>
 
@@ -36,12 +44,24 @@ const loadNextPage = async () => {
     <p v-else class="text-red-500">{{ stockStore.error }}</p>
 
     <div class="flex justify-between mt-4" v-if="!stockStore.loading && !stockStore.error">
-      <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+      <button
+        class="px-4 py-2 text-white rounded-lg transition"
+        :class="{
+          'bg-blue-600 hover:bg-blue-700 cursor-pointer': stockStore.stocks.BeforePages.length > 0,
+          'bg-gray-400 cursor-not-allowed opacity-50': stockStore.stocks.BeforePages.length === 0,
+        }"
+        :disabled="stockStore.stocks.BeforePages.length === 0"
+        @click="loadBeforePage"
+      >
         Anterior
       </button>
 
       <button
-        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+        class="px-4 py-2 text-white rounded-lg transition"
+        :class="{
+          'bg-blue-600 hover:bg-blue-700 cursor-pointer': stockStore.stocks.NextPage,
+          'bg-gray-400 cursor-not-allowed opacity-50': !stockStore.stocks.NextPage,
+        }"
         :disabled="!stockStore.stocks.NextPage"
         @click="loadNextPage"
       >
