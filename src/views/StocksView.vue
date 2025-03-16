@@ -7,7 +7,9 @@ const stockStore = useStockStore()
 
 // Load stocks when the component is mounted
 onMounted(() => {
-  stockStore.fetchStocks({})
+  if (!stockStore.stocks.Items || stockStore.stocks.Items.length === 0) {
+    stockStore.fetchStocks({})
+  }
 })
 
 const loadBeforePage = async () => {

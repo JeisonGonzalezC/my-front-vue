@@ -26,6 +26,13 @@ const stockDetail = computed(() => stockStore.stocks.Items.find((stock) => stock
     <div v-if="loading" class="text-blue-500">Cargando datos...</div>
 
     <div v-else-if="stockDetail" class="p-6 bg-gray-100 rounded-lg shadow-md">
+      <button
+        @click="$router.push({ path: '/stocks' })"
+        class="mb-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+      >
+        ⬅ Regresar
+      </button>
+
       <StockDetail :stockDetail="{ ...stockDetail }" />
     </div>
     <div v-else class="text-red-500">Stock no encontrado</div>
